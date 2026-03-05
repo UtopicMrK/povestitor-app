@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Povestitor Magic</title>
+  <meta name="description" content="Companion app pentru Povestitor Magic">
+  <meta name="theme-color" content="#1a1a2e">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ═══ CONNECT SCREEN ═══ -->
+  <div id="screen-connect" class="screen active">
+    <div class="connect-wrap">
+      <div class="connect-icon">&#129497;</div>
+      <h1>Povestitor Magic</h1>
+      <p class="connect-sub">Conecteaza-te la dispozitiv</p>
+      <div class="connect-card">
+        <label for="ip-input">Adresa IP a dispozitivului</label>
+        <input type="text" id="ip-input" placeholder="ex: 192.168.1.100" inputmode="url" autocomplete="off">
+        <button id="btn-connect" class="btn-primary" onclick="App.connect()">
+          <span class="btn-text">Conecteaza</span>
+          <span class="btn-loader" style="display:none"></span>
+        </button>
+        <p id="connect-error" class="error-text"></p>
+        <div class="connect-hint">
+          <p>&#128161; Gasesti IP-ul in Serial Monitor<br>sau pe pagina <b>http://192.168.4.1</b> in AP mode</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ MAIN APP (tabs) ═══ -->
+  <div id="app-container" style="display:none">
+
+    <!-- ─── TAB: ACASA ─── -->
+    <div id="tab-home" class="tab-content active">
+      <header class="app-header">
+        <h1>&#129497; Povestitor</h1>
+        <div id="connection-dot" class="dot dot-green" title="Conectat"></div>
+      </header>
+
+      <!-- Status Card -->
+      <div class="card card-status">
+        <div class="card-header">
+          <span class="card-icon">&#128214;</span>
+          <div>
+            <div class="card-label">Poveste curenta</div>
+            <div id="home-story" class="card-value">-</div>
+          </div>
+        </div>
+        <div class="status-grid">
+          <div class="stat">
+            <div class="stat-icon" id="state-dot">&#9679;</div>
+            <div class="stat-label">Stare</div>
+            <div class="stat-value" id="home-state">-</div>
+          </div>
+          <div class="stat">
+            <div class="stat-icon">&#128172;</div>
+            <div class="stat-label">Mesaje</div>
+            <div class="stat-value" id="home-messages">0</div>
+          </div>
+          <div class="stat">
+            <div class="stat-icon">&#128225;</div>
+            <div class="stat-label">WiFi</div>
+            <div class="stat-value" id="home-rssi">-</div>
+          </div>
+          <div class="stat">
+            <div class="stat-icon">&#9201;</div>
+            <div class="stat-label">Pornit</div>
+            <div class="stat-value" id="home-uptime">-</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Volume Card -->
+      <div class="card card-volume">
+        <div class="card-header">
+          <span class="card-icon" id="vol-icon">&#128266;</span>
+          <div>
+            <div class="card-label">Volum</div>
+            <div class="card-value" id="vol-value">100%</div>
+          </div>
+        </div>
+        <input type="range" id="vol-slider" min="0" max="100" value="100" class="slider"
+               oninput="App.onVolumeSlide(this.value)"
+               onchange="App.setVolume(this.value)">
+        <div class="vol-presets">
+          <button class="vol-btn" onclick="App.setVolume(25)">&#129303;</button>
+          <button class="vol-btn" onclick="App.setVolume(50)">&#128264;</button>
+          <button class="vol-btn" onclick="App.setVolume(75)">&#128265;</button>
+          <button class="vol-btn" onclick="App.setVolume(100)">&#128266;</button>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="card">
+        <button class="btn-action btn-danger" onclick="App.resetConversation()">
+          &#128260; Reseteaza conversatia
+        </button>
+      </div>
+    </div>
+
+    <!-- ─── TAB: POVESTI ─── -->
+    <div id="tab-stories" class="tab-content">
+      <header class="app-header">
+        <h1>&#128218; Povesti</h1>
+      </header>
+      <div id="stories-list" class="stories-grid">
+        <!-- populated by JS -->
+      </div>
+    </div>
+
+    <!-- ─── TAB: SETARI ─── -->
+    <div id="tab-settings" class="tab-content">
+      <header class="app-header">
+        <h1>&#9881; Setari</h1>
+      </header>
+
+      <!-- WiFi Card -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-icon">&#128225;</span>
+          <div>
+            <div class="card-label">WiFi</div>
+            <div class="card-value" id="set-wifi-ssid">-</div>
+          </div>
+        </div>
+        <div class="info-row">
+          <span>Semnal</span>
+          <span id="set-wifi-rssi">-</span>
+        </div>
+        <div class="info-row">
+          <span>IP</span>
+          <span id="set-wifi-ip">-</span>
+        </div>
+        <div class="info-row">
+          <span>MAC</span>
+          <span id="set-wifi-mac">-</span>
+        </div>
+      </div>
+
+      <!-- Change WiFi -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-icon">&#128274;</span>
+          <div class="card-label">Schimba WiFi</div>
+        </div>
+        <div class="form-group">
+          <label>Nume retea (SSID)</label>
+          <input type="text" id="wifi-ssid" placeholder="Numele retelei WiFi" maxlength="32">
+        </div>
+        <div class="form-group">
+          <label>Parola</label>
+          <input type="password" id="wifi-pass" placeholder="Parola WiFi" maxlength="63">
+        </div>
+        <button class="btn-action btn-primary-action" onclick="App.saveWifi()">
+          &#128190; Salveaza si reporneste
+        </button>
+        <p class="hint-text">Dispozitivul va reporni. Reconecteaza-te la noua retea.</p>
+      </div>
+
+      <!-- Device Info -->
+      <div class="card">
+        <div class="card-header">
+          <span class="card-icon">&#128187;</span>
+          <div class="card-label">Dispozitiv</div>
+        </div>
+        <div class="info-row">
+          <span>Versiune firmware</span>
+          <span id="set-version">-</span>
+        </div>
+        <div class="info-row">
+          <span>Memorie libera</span>
+          <span id="set-heap">-</span>
+        </div>
+        <div class="info-row">
+          <span>Timp pornit</span>
+          <span id="set-uptime">-</span>
+        </div>
+      </div>
+
+      <!-- Disconnect -->
+      <div class="card">
+        <button class="btn-action btn-secondary" onclick="App.disconnect()">
+          &#128275; Deconecteaza dispozitivul
+        </button>
+        <p class="hint-text">Vei fi redirectionat la ecranul de conectare.</p>
+      </div>
+    </div>
+
+    <!-- ═══ TAB BAR ═══ -->
+    <nav class="tab-bar">
+      <button class="tab active" data-tab="home" onclick="App.switchTab('home')">
+        <span class="tab-icon">&#127968;</span>
+        <span class="tab-label">Acasa</span>
+      </button>
+      <button class="tab" data-tab="stories" onclick="App.switchTab('stories')">
+        <span class="tab-icon">&#128218;</span>
+        <span class="tab-label">Povesti</span>
+      </button>
+      <button class="tab" data-tab="settings" onclick="App.switchTab('settings')">
+        <span class="tab-icon">&#9881;</span>
+        <span class="tab-label">Setari</span>
+      </button>
+    </nav>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js');
+    }
+  </script>
+</body>
+</html>
