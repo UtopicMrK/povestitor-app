@@ -195,7 +195,9 @@ const App = {
     // Volume
     const slider = document.getElementById('vol-slider');
     slider.value = status.volume;
-    slider.style.setProperty('--vol-pct', status.volume + '%');
+    // Normalize to 0-100% for CSS gradient (slider max is 150)
+    const volPct = Math.round(status.volume / 150 * 100);
+    slider.style.setProperty('--vol-pct', volPct + '%');
     document.getElementById('vol-value').textContent = status.volume + '%';
     this.updateVolIcon(status.volume);
 
@@ -286,8 +288,11 @@ const App = {
 
   // ─── VOLUME ───
   onVolumeSlide(val) {
+    val = parseInt(val);
     document.getElementById('vol-value').textContent = val + '%';
-    document.getElementById('vol-slider').style.setProperty('--vol-pct', val + '%');
+    // Normalize to 0-100% for CSS gradient (slider max is 150)
+    const pct = Math.round(val / 150 * 100);
+    document.getElementById('vol-slider').style.setProperty('--vol-pct', pct + '%');
     this.updateVolIcon(val);
   },
 
@@ -304,11 +309,12 @@ const App = {
   },
 
   updateVolIcon(vol) {
+    vol = parseInt(vol);
     const icon = document.getElementById('vol-icon');
-    if (vol === 0) icon.textContent = '\u{1F507}';       // muted
-    else if (vol <= 33) icon.textContent = '\u{1F508}';   // low
-    else if (vol <= 66) icon.textContent = '\u{1F509}';   // medium
-    else icon.textContent = '\u{1F50A}';                  // high
+    if (vol === 0)      icon.textContent = '\u{1F507}';   // muted
+    else if (vol <= 50) icon.textContent = '\u{1F508}';   // low
+    else if (vol <= 100) icon.textContent = '\u{1F509}';  // medium
+    else                icon.textContent = '\u{1F50A}';   // high (>100%)
   },
 
   // ─── RESET CONVERSATION ───

@@ -87,14 +87,14 @@
             <div class="card-value" id="vol-value">100%</div>
           </div>
         </div>
-        <input type="range" id="vol-slider" min="0" max="100" value="100" class="slider"
+        <input type="range" id="vol-slider" min="0" max="150" value="100" class="slider"
                oninput="App.onVolumeSlide(this.value)"
                onchange="App.setVolume(this.value)">
         <div class="vol-presets">
           <button class="vol-btn" onclick="App.setVolume(25)">&#129303;</button>
-          <button class="vol-btn" onclick="App.setVolume(50)">&#128264;</button>
-          <button class="vol-btn" onclick="App.setVolume(75)">&#128265;</button>
-          <button class="vol-btn" onclick="App.setVolume(100)">&#128266;</button>
+          <button class="vol-btn" onclick="App.setVolume(75)">&#128264;</button>
+          <button class="vol-btn" onclick="App.setVolume(100)">&#128265;</button>
+          <button class="vol-btn" onclick="App.setVolume(150)">&#128266;</button>
         </div>
       </div>
 
