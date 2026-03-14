@@ -1,5 +1,5 @@
 // Service Worker — Povestitor Magic PWA
-const CACHE_NAME = 'povestitor-v2';
+const CACHE_NAME = 'povestitor-v3';
 const APP_SHELL = [
   './',
   './index.html',
