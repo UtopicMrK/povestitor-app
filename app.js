@@ -195,7 +195,7 @@ const App = {
     // Volume
     const slider = document.getElementById('vol-slider');
     slider.value = status.volume;
-    slider.style.setProperty('--vol-pct', status.volume + '%');
+    slider.style.setProperty('--vol-pct', (status.volume / 150 * 100).toFixed(1) + '%');
     document.getElementById('vol-value').textContent = status.volume + '%';
     this.updateVolIcon(status.volume);
 
@@ -288,7 +288,7 @@ const App = {
   onVolumeSlide(val) {
     val = parseInt(val);
     document.getElementById('vol-value').textContent = val + '%';
-    document.getElementById('vol-slider').style.setProperty('--vol-pct', val + '%');
+    document.getElementById('vol-slider').style.setProperty('--vol-pct', (val / 150 * 100).toFixed(1) + '%');
     this.updateVolIcon(val);
   },
 
